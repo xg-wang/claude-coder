@@ -89,7 +89,7 @@ def embed_repo(repo_url: str) -> Chroma:
                         lang = _ext_to_lang(file_ext)
                     except ValueError:
                         logging.info(f"File extension {file_ext} not supported")
-                        continue
+                        return
                     with open(file_path, "r") as f:
                         code = f.read()
                         logging.info(f"Embedding {file_path} as {lang.value}")
