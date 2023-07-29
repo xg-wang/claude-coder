@@ -43,9 +43,15 @@ def gen_response(inputs):
 
 def main():
 
-    # 1. Add github repo and generate the repo database via LangChain
-        # Chain:
-    # 2. Accept the user input and call Anthropic API to get response
+    # 1.1 Add github repo and generate the repo database via LangChain
+        # Repo clone
+        # Text splitter
+        # Chroma persistence
+    # 1.2 Context generation based on user input
+        # Similarity search in chromdb given user input
+        # re-generate the prompt: user input + context
+    # 2. Anthropic API to get final response
+        # 
 
     page.chat_page()
 
