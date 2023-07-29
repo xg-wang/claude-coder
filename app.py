@@ -26,7 +26,6 @@ def gen_reponse(inputs):
             max_tokens_to_sample=MAX_TOKEN_TO_SAMPLE,
             model=MODEL_NAME,
         )
-
         return completion.completion
     except APIConnectionError as e:
         print("The server could not be reached")
@@ -39,6 +38,9 @@ def gen_reponse(inputs):
         print(e.response)
 
 def main():
+
+    # 1. Add github repo and generate the repo database via LangChain
+    # 2. Accept the user input and call Anthropic API to get response
 
     demo = gr.Interface(fn=gen_reponse, inputs="text", outputs="text")
     
