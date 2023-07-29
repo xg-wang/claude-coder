@@ -1,2 +1,4 @@
 .anthropic_api_key
 scratch
+.env
+git_repos

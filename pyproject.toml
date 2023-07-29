@@ -10,6 +10,8 @@ packages = [{include = "claude_coder"}]
 python = "^3.10"
 chromadb = "^0.4.3"
 anthropic = "^0.3.6"
+openai = "^0.27.8"
+langchain = "^0.0.247"
 
 
 [build-system]
