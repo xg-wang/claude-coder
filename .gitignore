@@ -1,4 +1,5 @@
 .anthropic_api_key
 scratch
 .env
+.venv
 git_repos
