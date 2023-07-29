@@ -121,8 +121,9 @@ def embed_repo(repo_url: str) -> Chroma:
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
-    db = embed_repo("https://github.com/tiangolo/fastapi")
-    docs = db.similarity_search("Tell me how to build a simple REST API in Python")
+    # openai.api_key = os.environ.get("OPENAI_API_KEY", "null")
+    db = embed_repo("https://github.com/openai/whisper")
+    docs = db.similarity_search("Tell me how to call whisper API in Python")
     print(len(docs))
     for doc in docs:
         print(f"File path: {doc.metadata['path']}")
