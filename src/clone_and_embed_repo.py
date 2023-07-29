@@ -81,7 +81,7 @@ def embed_repo(repo_url: str) -> Chroma:
             for root, dirs, files in os.walk(repo_dir, topdown=True):
                 dirs[:] = [d for d in dirs if d not in IGNORE_LIST]
 
-                def process_one_file(file):
+                for file in files:
                     logging.info(f"Processing {file}")
                     file_path = os.path.join(root, file)
                     file_ext = os.path.splitext(file_path)[1]
@@ -106,8 +106,6 @@ def embed_repo(repo_url: str) -> Chroma:
                                 documents=[doc.page_content],
                                 metadatas=[doc.metadata],
                             )
-
-                executor.map(process_one_file, files)
     langchain_chroma = Chroma(
         client=persistent_client,
         collection_name=collection_name,
