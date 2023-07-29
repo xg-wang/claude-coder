@@ -11,8 +11,6 @@ from langchain.chains import ConversationalRetrievalChain
 import page
 
 def gen_response(inputs):
-
-    load_dotenv(find_dotenv())
     api_key = os.environ.get('CLAUDE_API_KEY', None)
     
     llm = ChatAnthropic(model=MODEL_NAME, anthropic_api_key=api_key)
