@@ -8,12 +8,19 @@ from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 MODEL_NAME = "claude-2"
 MAX_TOKEN_TO_SAMPLE = 1000
 
-def gen_reponse(inputs):
-    pass
+def prepare_inputs():
+    inputs = 'How to get an Anthropic offer?'
 
-def main():
+    return inputs
+
+
+
+def gen_reponse(inputs):
+
+    inputs = prepare_inputs()
+
     api_key = os.environ.get('CLAUDE_API_KEY', None)
-    print(api_key)
+
     anthropic = Anthropic(
         api_key=api_key,
     )
@@ -21,8 +28,14 @@ def main():
     completion = anthropic.completions.create(
         model=MODEL_NAME,
         max_tokens_to_sample=MAX_TOKEN_TO_SAMPLE,
-        prompt=f"{HUMAN_PROMPT} how does a court case get to the Supreme Court? {AI_PROMPT}",
+        prompt=f"{HUMAN_PROMPT} {inputs} {AI_PROMPT}",
     )
-    print(completion.completion)
+
+    return completion.completion
+
+def main():
+    print(gen_reponse)
+    
+    
 
 
