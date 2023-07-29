@@ -6,6 +6,7 @@ from langchain.text_splitter import (
     Language,
 )
 
+import click
 import logging
 import uuid
 import os
@@ -58,20 +59,25 @@ def _clone_repo(repo_url: str, repo_dir: pathlib.Path):
         subprocess.run(["rm", "-rf", repo_dir])
 
 
-def embed_repo(repo_url: str) -> Chroma:
+def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
     # Embed a repo based on its url
     repo_name = repo_url.split("/")[-1]
-    collection_name = "/".join(repo_url.split("/")[-2:-1])
+    collection_name = "_".join(repo_url.split("/")[-2:])
     repo_dir = GIT_REPOS_DIR / repo_name
     persistent_client = chromadb.PersistentClient(path=CHROMA_DB.__str__())
     # disallowed_special=() is required to avoid Exception: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte from tiktoken for some repositories
     embedding_function = OpenAIEmbeddings(disallowed_special=())
-
     try:
-        collection = persistent_client.get_collection(
-            name=collection_name, embedding_function=embedding_function.embed_documents
-        )
+        if reset:
+            logging.info(f"Resetting database collection {collection_name}")
+            persistent_client.delete_collection(collection_name)
+        else:
+            logging.info(f"Retrieving database collection {collection_name}")
+            collection = persistent_client.get_collection(
+                name=collection_name, embedding_function=embedding_function.embed_documents
+            )
     except ValueError:
+        logging.info(f"Creating database collection {collection_name}")
         collection = persistent_client.create_collection(
             name=collection_name, embedding_function=embedding_function.embed_documents
         )
@@ -89,7 +95,7 @@ def embed_repo(repo_url: str) -> Chroma:
                         lang = _ext_to_lang(file_ext)
                     except ValueError:
                         logging.info(f"File extension {file_ext} not supported")
-                        return
+                        continue
                     with open(file_path, "r") as f:
                         code = f.read()
                         logging.info(f"Embedding {file_path} as {lang.value}")
@@ -106,6 +112,7 @@ def embed_repo(repo_url: str) -> Chroma:
                                 documents=[doc.page_content],
                                 metadatas=[doc.metadata],
                             )
+
     langchain_chroma = Chroma(
         client=persistent_client,
         collection_name=collection_name,
@@ -117,12 +124,21 @@ def embed_repo(repo_url: str) -> Chroma:
     return langchain_chroma
 
 
-if __name__ == "__main__":
+# poetry run python src/clone_and_embed_repo.py --reset --repo "https://github.com/openai/whisper" --query 'what is whisper'
+# Use python click to create a CLI, --reset to reset the database
+@click.command()
+@click.option('--repo', required=True, help='The URL of the repo.')
+@click.option('--query', required=True, help='The query for LLM.')
+@click.option('--reset', is_flag=True, default=False, help='Reset ChromaDB.')
+def main(repo, query, reset):
     load_dotenv(find_dotenv())
-    # openai.api_key = os.environ.get("OPENAI_API_KEY", "null")
-    db = embed_repo("https://github.com/openai/whisper")
-    docs = db.similarity_search("Tell me how to call whisper API in Python")
+    db = embed_repo(repo, reset=reset)
+    docs = db.similarity_search(query, k=10)
     print(len(docs))
     for doc in docs:
-        print(f"File path: {doc.metadata['path']}")
+        print(f"\nFile path: {doc.metadata['path']}")
         print(f"Document content:\n{doc.page_content}")
+
+
+if __name__ == "__main__":
+    main()
