@@ -4,6 +4,7 @@
 
 import os
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT, APIConnectionError, RateLimitError, APIStatusError
+import gradio as gr
 
 MODEL_NAME = "claude-2"
 MAX_TOKEN_TO_SAMPLE = 1000
@@ -13,11 +14,7 @@ def prepare_inputs():
 
     return inputs
 
-
-
-def gen_reponse():
-
-    inputs = prepare_inputs()
+def gen_reponse(inputs):
 
     api_key = os.environ.get('CLAUDE_API_KEY', None)
 
@@ -30,7 +27,7 @@ def gen_reponse():
             model=MODEL_NAME,
         )
 
-        print(completion.completion)
+        return completion.completion
     except APIConnectionError as e:
         print("The server could not be reached")
         print(e.__cause__)  # an underlying Exception, likely raised within httpx.
@@ -42,8 +39,10 @@ def gen_reponse():
         print(e.response)
 
 def main():
-    gen_reponse()
+
+    demo = gr.Interface(fn=gen_reponse, inputs="text", outputs="text")
     
-    
+    demo.launch()   
+
 
 
