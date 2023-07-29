@@ -8,6 +8,7 @@ from app import MODEL_NAME
 from src.clone_and_embed_repo import embed_repo
 from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
+import page
 
 def gen_response(inputs):
 
@@ -69,7 +70,7 @@ def main():
     # 2. Anthropic API to get final response
         # 
 
-    page.chat_page()
+    # page.chat_page()
 
     demo = gr.Interface(fn=gen_response, inputs="text", outputs="text")
 
