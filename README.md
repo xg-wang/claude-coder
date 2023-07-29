@@ -18,6 +18,13 @@ curl -sSL https://install.python-poetry.org | python3 -
 poetry install
 ```
 
+## How to run
+
+```
+python run.py
+```
+
+
 ## Links
 
 - Key: https://console.anthropic.com/account/keys
