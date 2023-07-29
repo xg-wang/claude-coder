@@ -1,12 +1,13 @@
 # main function to run the demo
 # 1. Reference the API key
-# 2. Generate the response 
+# 2. Generate the response
 
 import os
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT, APIConnectionError, RateLimitError, APIStatusError
 import gradio as gr
 import httpx
 from langchain import llms
+import page
 
 MODEL_NAME = "claude-2"
 MAX_TOKEN_TO_SAMPLE = 1000
@@ -17,7 +18,7 @@ def prepare_inputs():
 
     return inputs
 
-def gen_reponse(inputs):
+def gen_response(inputs):
 
     api_key = os.environ.get('CLAUDE_API_KEY', None)
 
@@ -43,12 +44,15 @@ def gen_reponse(inputs):
 def main():
 
     # 1. Add github repo and generate the repo database via LangChain
-        # Chain: 
+        # Chain:
     # 2. Accept the user input and call Anthropic API to get response
 
-    demo = gr.Interface(fn=gen_reponse, inputs="text", outputs="text")
-    
-    demo.launch()   
+    page.chat_page()
+
+    demo = gr.Interface(fn=gen_response, inputs="text", outputs="text")
+
+    demo.launch()
+
 
 
 
