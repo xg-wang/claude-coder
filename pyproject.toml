@@ -8,6 +8,7 @@ packages = [{include = "claude_coder"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+chromadb = "^0.4.3"
 
 
 [build-system]

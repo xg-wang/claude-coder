@@ -1,5 +1,23 @@
 # Anthropic Hackathon
 
+## Development
+
+```sh
+git clone git@github.com:xg-wang/claude-coder.git
+
+mkdir scratch # you can experiment with anything here, it's git ignored
+
+echo '<anthropic-api-key>' > .anthropic_api_key
+
+python3.10 -m venv .venv
+
+source .venv/bin/activate
+
+curl -sSL https://install.python-poetry.org | python3 -
+
+poetry install
+```
+
 ## Links
 
 - Key: https://console.anthropic.com/account/keys
