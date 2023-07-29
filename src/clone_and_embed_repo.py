@@ -13,7 +13,6 @@ import os
 from contextlib import contextmanager
 import subprocess
 import pathlib
-from concurrent.futures import ThreadPoolExecutor as Pool
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -81,9 +80,7 @@ def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
         collection = persistent_client.create_collection(
             name=collection_name, embedding_function=embedding_function.embed_documents
         )
-        executor = Pool(max_workers=5)
         with _clone_repo(repo_url, repo_dir):
-            # Walk the repo directory and detect ext and load each language, ignore files that are in .gitignore
             for root, dirs, files in os.walk(repo_dir, topdown=True):
                 dirs[:] = [d for d in dirs if d not in IGNORE_LIST]
 
