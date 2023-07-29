@@ -5,4 +5,5 @@ scratch
 .venv
 git_repos
 flagged
+.chroma_db
 
