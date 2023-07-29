@@ -103,10 +103,9 @@ def embed_repo(repo_url: str) -> Chroma:
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
-    # openai.api_key = os.environ.get("OPENAI_API_KEY", "null")
     db = embed_repo("https://github.com/tiangolo/fastapi")
     docs = db.similarity_search("Tell me how to build a simple REST API in Python")
     print(len(docs))
-    print(docs[0].page_content)
-
+    for doc in docs:
+        print(doc.page_content)
 
