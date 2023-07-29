@@ -21,7 +21,7 @@ def gen_reponse(inputs):
 
     api_key = os.environ.get('CLAUDE_API_KEY', None)
 
-    client = Anthropic(api_key=api_key, timeout=httpx.Timeout(60.0, read=5.0, write=10.0, connect=2.0))
+    client = Anthropic(api_key=api_key)
 
     try:
         completion = client.with_options(max_retries=MAX_RETRIES).completions.create(
