@@ -13,6 +13,7 @@ import os
 from contextlib import contextmanager
 import subprocess
 import pathlib
+from concurrent.futures import ThreadPoolExecutor as Pool
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -46,6 +47,7 @@ def _ext_to_lang(ext: str) -> Language:
 
 @contextmanager
 def _clone_repo(repo_url: str, repo_dir: pathlib.Path):
+    GIT_REPOS_DIR.mkdir(exist_ok=True)
     # Create a context manager, that clones a repo based on its url then cleans up
     if not repo_dir.exists():
         subprocess.run(["git", "clone", "--depth", "1", repo_url, repo_dir], cwd=GIT_REPOS_DIR)
@@ -67,11 +69,12 @@ def embed_repo(repo_url: str) -> Chroma:
         collection = persistent_client.get_collection(name=collection_name, embedding_function=embedding_function.embed_documents)
     except ValueError:
         collection = persistent_client.create_collection(name=collection_name, embedding_function=embedding_function.embed_documents)
+        executor = Pool(max_workers=5)
         with _clone_repo(repo_url, repo_dir):
             # Walk the repo directory and detect ext and load each language, ignore files that are in .gitignore
             for root, dirs, files in os.walk(repo_dir, topdown=True):
                 dirs[:] = [d for d in dirs if d not in IGNORE_LIST]
-                for file in files:
+                def process_one_file(file):
                     logging.info(f"Processing {file}")
                     file_path = os.path.join(root, file)
                     file_ext = os.path.splitext(file_path)[1]
@@ -89,6 +92,7 @@ def embed_repo(repo_url: str) -> Chroma:
                         lang_docs = lang_splitter.create_documents(texts=[code], metadatas=[{'language': lang.value}])
                         for doc in lang_docs:
                             collection.add(ids=[str(uuid.uuid4())], documents=[doc.page_content], metadatas=[doc.metadata])
+                executor.map(process_one_file, files)
     langchain_chroma = Chroma(
         client=persistent_client,
         collection_name=collection_name,
