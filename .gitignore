@@ -1,5 +1,8 @@
 .anthropic_api_key
 scratch
 .env
+.env.example
 .venv
 git_repos
+flagged
+
