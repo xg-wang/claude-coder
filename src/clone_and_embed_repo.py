@@ -1,4 +1,3 @@
-import openai
 import chromadb
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
@@ -20,7 +19,7 @@ from dotenv import load_dotenv, find_dotenv
 GIT_REPOS_DIR = pathlib.Path(__file__).parent.parent / "git_repos"
 CHROMA_DB = pathlib.Path(__file__).parent.parent / ".chroma_db"
 
-IGNORE_LIST = ['.git', 'node_modules', '__pycache__', '.idea', '.vscode']
+IGNORE_LIST = [".git", "node_modules", "__pycache__", ".idea", ".vscode"]
 
 logging.basicConfig(level=logging.INFO)
 
@@ -28,15 +27,15 @@ logging.basicConfig(level=logging.INFO)
 def _ext_to_lang(ext: str) -> Language:
     # Convert a file extension to a language
     ext = ext.removeprefix(".")
-    if ext == 'py':
+    if ext == "py":
         return Language.PYTHON
-    elif ext == 'rs':
+    elif ext == "rs":
         return Language.RUST
-    elif ext == 'rb':
+    elif ext == "rb":
         return Language.RUBY
-    elif ext == 'md':
+    elif ext == "md":
         return Language.MARKDOWN
-    elif ext in ('ts', 'tsx', 'jsx', 'js'):
+    elif ext in ("ts", "tsx", "jsx", "js"):
         return Language.JS
     else:
         for lang in Language:
@@ -50,11 +49,14 @@ def _clone_repo(repo_url: str, repo_dir: pathlib.Path):
     GIT_REPOS_DIR.mkdir(exist_ok=True)
     # Create a context manager, that clones a repo based on its url then cleans up
     if not repo_dir.exists():
-        subprocess.run(["git", "clone", "--depth", "1", repo_url, repo_dir], cwd=GIT_REPOS_DIR)
+        subprocess.run(
+            ["git", "clone", "--depth", "1", repo_url, repo_dir], cwd=GIT_REPOS_DIR
+        )
     try:
         yield
     finally:
         subprocess.run(["rm", "-rf", repo_dir])
+
 
 def embed_repo(repo_url: str) -> Chroma:
     # Embed a repo based on its url
@@ -66,14 +68,19 @@ def embed_repo(repo_url: str) -> Chroma:
     embedding_function = OpenAIEmbeddings(disallowed_special=())
 
     try:
-        collection = persistent_client.get_collection(name=collection_name, embedding_function=embedding_function.embed_documents)
+        collection = persistent_client.get_collection(
+            name=collection_name, embedding_function=embedding_function.embed_documents
+        )
     except ValueError:
-        collection = persistent_client.create_collection(name=collection_name, embedding_function=embedding_function.embed_documents)
+        collection = persistent_client.create_collection(
+            name=collection_name, embedding_function=embedding_function.embed_documents
+        )
         executor = Pool(max_workers=5)
         with _clone_repo(repo_url, repo_dir):
             # Walk the repo directory and detect ext and load each language, ignore files that are in .gitignore
             for root, dirs, files in os.walk(repo_dir, topdown=True):
                 dirs[:] = [d for d in dirs if d not in IGNORE_LIST]
+
                 def process_one_file(file):
                     logging.info(f"Processing {file}")
                     file_path = os.path.join(root, file)
@@ -89,17 +96,28 @@ def embed_repo(repo_url: str) -> Chroma:
                         lang_splitter = RecursiveCharacterTextSplitter.from_language(
                             language=lang, chunk_size=1024, chunk_overlap=0
                         )
-                        lang_docs = lang_splitter.create_documents(texts=[code], metadatas=[{'language': lang.value}])
+                        lang_docs = lang_splitter.create_documents(
+                            texts=[code],
+                            metadatas=[{"language": lang.value, "path": file_path}],
+                        )
                         for doc in lang_docs:
-                            collection.add(ids=[str(uuid.uuid4())], documents=[doc.page_content], metadatas=[doc.metadata])
+                            collection.add(
+                                ids=[str(uuid.uuid4())],
+                                documents=[doc.page_content],
+                                metadatas=[doc.metadata],
+                            )
+
                 executor.map(process_one_file, files)
     langchain_chroma = Chroma(
         client=persistent_client,
         collection_name=collection_name,
         embedding_function=embedding_function,
     )
-    logging.info(f"Embedding repo {repo_url} has {langchain_chroma._collection.count()} documents")
+    logging.info(
+        f"Embedding repo {repo_url} has {langchain_chroma._collection.count()} documents"
+    )
     return langchain_chroma
+
 
 if __name__ == "__main__":
     load_dotenv(find_dotenv())
@@ -107,5 +125,5 @@ if __name__ == "__main__":
     docs = db.similarity_search("Tell me how to build a simple REST API in Python")
     print(len(docs))
     for doc in docs:
-        print(doc.page_content)
-
+        print(f"File path: {doc.metadata['path']}")
+        print(f"Document content:\n{doc.page_content}")
