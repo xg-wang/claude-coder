@@ -58,7 +58,6 @@ class CodeInterpreterTool(BaseTool):
         """Run code in a Docker container."""
         code = clean_code(code)
         logging.info(f"Running code\n```\n{code}\n```\n")
-        logging.info(f"run_manager: {run_manager}")
         # Use subprocess.run to call docker run, and return the stdio or stderr
         p = subprocess.run(
             ["docker", "run", "--rm", "-i", "python_code_interpreter:latest"],
@@ -69,9 +68,9 @@ class CodeInterpreterTool(BaseTool):
             text=True,
         )
         if p.returncode != 0:
-            logging.info(f"returncode: {p.returncode}")
-            logging.info(f"stdout: {p.stdout}")
-            logging.info(f"stderr: {p.stderr}")
+            # logging.info(f"returncode: {p.returncode}")
+            # logging.info(f"stdout: {p.stdout}")
+            # logging.info(f"stderr: {p.stderr}")
             return p.stderr or "The code is not valid"
         else:
             return p.stdout
@@ -106,6 +105,8 @@ if __name__ == "__main__":
         # logging.info(f"Step: {step}")
         if output := step.get("intermediate_step"):
             action, value = output[0]
-            logging.info(f"action:\n{action.tool}\nlog:\n{action.log}\nvalue:\n{value}")
+            logging.info(f"action:\n{action.tool}")
+            logging.info(f"tool input:\n{action.tool_input}")
+            logging.info(f"value:\n{value}")
         elif output := step.get("output"):
             logging.info(f"Output: {output}")
