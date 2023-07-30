@@ -10,8 +10,8 @@ from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
 import page
 
-def gen_retriever(repo_url):
-    db = embed_repo(repo_url, reset=False)
+def gen_retriever(repo_url, reset):
+    db = embed_repo(repo_url, reset)
     retriever = db.as_retriever()
     retriever.search_kwargs["distance_metric"] = "cos"
     retriever.search_kwargs["fetch_k"] = 20
@@ -20,13 +20,19 @@ def gen_retriever(repo_url):
 
     return retriever
 
+def get_reset_flag(repo_url):
+    # TODO: check if repo_url is in the chromdb
+    return False
+
 def get_repo_url():
     # TODO: get from gr text input
     return "https://github.com/openai/whisper"
 
 def gen_response(inputs):
     llm = ChatAnthropic(model=MODEL_NAME, anthropic_api_key=os.environ.get('CLAUDE_API_KEY', None))
-    retriever = gen_retriever(get_repo_url())
+    repo_url = get_repo_url()
+    reset = get_reset_flag(repo_url)
+    retriever = gen_retriever(repo_url, reset)
     qa = ConversationalRetrievalChain.from_llm(llm, retriever=retriever)
     result = qa({"question": inputs, "chat_history": []})
     return result["answer"]
