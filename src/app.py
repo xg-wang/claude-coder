@@ -58,10 +58,15 @@ def chat_page():
 
             learn_repo_btn.click(learn_repo, repo_url, learn_progress)
 
-        chatbot = gr.Chatbot()
-        msg = gr.Textbox()
-        clear = gr.ClearButton([msg, chatbot])
-        msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
+
+        with gr.Row():
+            with gr.Column(scale=5):
+                chatbot = gr.Chatbot().style(height=750)
+                msg = gr.Textbox()
+                clear = gr.ClearButton([msg, chatbot])
+                msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
+            with gr.Column(scale=5):
+                code_log = gr.TextArea(label="Logging").style(height=500)
 
     demo.launch()
 
