@@ -21,9 +21,8 @@ import langchain
 
 def clean_code(code: str) -> str:
     code = code.strip()
-    if code.startswith("```python"):
-        code = code.removeprefix("```python\n")
-        code = code.removesuffix("```")
+    code = code.removeprefix("```python\n")
+    code = code.removesuffix("```")
     return code
 
 class CodeInterpreterTool(BaseTool):
