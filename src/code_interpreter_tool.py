@@ -18,6 +18,7 @@ from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models import ChatAnthropic
 import langchain
+from .util import setup_logging
 
 def clean_code(code: str) -> str:
     """Clean code from Markdown code blocks."""
@@ -92,10 +93,7 @@ class CodeInterpreterTool(BaseTool):
 
 
 if __name__ == "__main__":
-    langchain.debug = False
-
-    load_dotenv(find_dotenv())
-    logging.basicConfig(level=logging.INFO)
+    setup_logging()
 
     tool = CodeInterpreterTool()
     agent = initialize_agent(
