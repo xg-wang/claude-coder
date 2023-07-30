@@ -2,6 +2,7 @@ from typing import Optional
 from io import BytesIO
 import logging
 import docker
+import subprocess
 from docker.errors import BuildError, ContainerError, ImageNotFound, APIError
 from docker import DockerClient
 from pydantic import Field
@@ -22,7 +23,9 @@ import langchain
 def clean_code(code: str) -> str:
     code = code.strip()
     code = code.removeprefix("```python\n")
+    code = code.removeprefix("`\n")
     code = code.removesuffix("```")
+    code = code.removesuffix("`")
     return code
 
 class CodeInterpreterTool(BaseTool):
@@ -32,7 +35,7 @@ class CodeInterpreterTool(BaseTool):
 
     DOCKERFILE = """
     FROM python:3.10
-    RUN pip install numpy pandas matplotlib seaborn pydantic
+    RUN pip install numpy pandas matplotlib seaborn pydantic chromadb
     """
 
     def __init__(self, *args, **kwargs):
@@ -57,27 +60,20 @@ class CodeInterpreterTool(BaseTool):
         code = clean_code(code)
         logging.info(f"Running code\n```\n{code}\n```\n")
         logging.info(f"run_manager: {run_manager}")
-        try:
-            logs = self.client.containers.run(
-                "python_code_interpreter:latest",
-                command=["python", "-c", code],
-                detach=False,
-                stdout=True,
-                stderr=True,
-                auto_remove=True,
-                mem_limit='1g',
-                network_disabled=False,
-            )
-            return str(logs, encoding='utf-8')
-        except ContainerError as ex:
-            logging.exception(f"Container error: {ex}")
-            return str(ex.stderr, encoding='utf-8')
-        except ImageNotFound as ex:
-            logging.exception(f"Image not found: {ex}")
-            return str(ex.stderr, encoding='utf-8')
-        except APIError as ex:
-            logging.exception(f"API error: {ex}")
-            return str(ex.stderr, encoding='utf-8')
+        # Use subprocess.run to call docker run, and return the stdio or stderr
+        p = subprocess.run(
+            ["docker", "run", "--rm", "-i", "python_code_interpreter:latest"],
+            input=code.encode('utf-8'),
+            capture_output=True,
+            check=False,
+        )
+        if p.returncode != 0:
+            logging.info(f"returncode: {p.returncode}")
+            logging.info(f"stdout: {p.stdout}")
+            logging.info(f"stderr: {p.stderr}")
+            return str(p.stderr, encoding='utf-8') or "The code is not valid"
+        else:
+            return str(p.stdout, encoding='utf-8')
 
     async def _arun(
         self,
@@ -97,10 +93,10 @@ if __name__ == "__main__":
     tool = CodeInterpreterTool()
     agent = initialize_agent(
         [tool],
-        ChatAnthropic(temperature=0, model='claude-2'),
-        # Anthropic(temperature=0, model='claude-2'),
+        # ChatAnthropic(temperature=0, model='claude-2'),
+        Anthropic(temperature=0, model='claude-2'),
         # ChatOpenAI(),
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True,
     )
-    agent.run("<Instruction>When you have the answer, always say 'Final Answer:'</Instruction>\tTell me how to run a basic example with pydantic")
+    agent.run("<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\thow to use ChromaDB functionalities? can you give an example")
