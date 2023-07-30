@@ -158,6 +158,11 @@ This adds sample documents, indexes them by embedding, queries using a new embed
 
 </details>
 
+How do you cowsay?
+
+![claude-coder-cowsay](./docs/claude_demo_cowsay.png)
+
+
 ## How it works
 
 ![claude-coder](./docs/claude-coder-arch.png)
