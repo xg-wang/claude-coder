@@ -5,8 +5,10 @@ MAX_RETRIES = 5
 
 def setup_logging(verbose = True):
     import logging
+    import langchain
     if verbose:
-        level = logging.DEBUG
+        langchain.debug = True
+        level = logging.INFO
     else:
         level = logging.WARNING
     logging.basicConfig(
@@ -15,5 +17,3 @@ def setup_logging(verbose = True):
         datefmt="%H:%M:%S"
     )
 
-    import langchain
-    langchain.debug = False
