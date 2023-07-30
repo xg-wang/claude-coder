@@ -16,13 +16,13 @@ It first realizes it was missing the document ids when calling add(), it then fi
 
 Here is how I would approach this question step-by-step:
 
-Thought: To answer how to use similarity search in ChromaDB, I should first look up the documentation.
+**Thought**: To answer how to use similarity search in ChromaDB, I should first look up the documentation.
 
-Action: code_search
+**Action**: code_search
 
-Action Input: how to do similarity search in chromadb python
+**Action Input**: how to do similarity search in chromadb python
 
-Observation:  Here is how to do similarity search in Chroma using Python:
+**Observation**:  Here is how to do similarity search in Chroma using Python:
 
 First, create a Chroma client and collection:
 
@@ -63,11 +63,11 @@ So in summary:
 
 Let me know if you have any other questions!
 
-Thought: Here is an example of using similarity search in ChromaDB with Python:
+**Thought**: Here is an example of using similarity search in ChromaDB with Python:
 
-Action: code_interpreter
+**Action**: code_interpreter
 
-Action Input:
+**Action Input**:
 ```python
 import chromadb
 
@@ -87,18 +87,18 @@ results = collection.query(query_embeddings=[query_embedding], n_results=2)
 print(results)
 ```
 
-Observation:
+**Observation**:
 ```
 Traceback (most recent call last):
   File "<stdin>", line 10, in <module>
 TypeError: Collection.add() missing 1 required positional argument: 'ids'
 ```
 
-Thought: My example code had an error because I was missing the document ids when calling add(). Here is the fixed code:
+**Thought**: My example code had an error because I was missing the document ids when calling add(). Here is the fixed code:
 
-Action: code_interpreter
+**Action**: code_interpreter
 
-Action Input:
+**Action Input**:
 ```python
 import chromadb
 
@@ -119,14 +119,14 @@ results = collection.query(query_embeddings=[query_embedding], n_results=2)
 print(results)
 ```
 
-Observation:
-```
+**Observation**:
+```json
 {'ids': [['doc1', 'doc2']], 'distances': [[0.030000001192092896, 0.12000000476837158]], 'metadatas': [[None, None]], 'embeddings': None, 'documents': [['Document 1', 'Document 2']]}
 ```
 
-Thought: The example code successfully runs similarity search on a ChromaDB collection. It adds two documents with embeddings, then queries using a new embedding to find the most similar documents. The print output shows the query returned the expected documents, along with distances and other metadata.
+**Thought**: The example code successfully runs similarity search on a ChromaDB collection. It adds two documents with embeddings, then queries using a new embedding to find the most similar documents. The print output shows the query returned the expected documents, along with distances and other metadata.
 
-Final Answer: Here is an example of using similarity search in ChromaDB with Python:
+**Final Answer**: Here is an example of using similarity search in ChromaDB with Python:
 
 ```python
 import chromadb
