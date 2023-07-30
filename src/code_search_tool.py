@@ -6,6 +6,7 @@ from langchain.text_splitter import (
     Language,
 )
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import click
 import logging
 import uuid
@@ -85,11 +86,12 @@ def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
         collection = persistent_client.create_collection(
             name=collection_name, embedding_function=embedding_function.embed_documents
         )
+        executor = ThreadPoolExecutor(max_workers=5)
         with _clone_repo(repo_url, repo_dir):
             for root, dirs, files in os.walk(repo_dir, topdown=True):
                 dirs[:] = [d for d in dirs if d not in IGNORE_LIST]
 
-                for file in files:
+                def process_file(file: str):
                     logging.info(f"Processing {file}")
                     file_path = os.path.join(root, file)
                     file_ext = os.path.splitext(file_path)[1]
@@ -97,7 +99,7 @@ def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
                         lang = _ext_to_lang(file_ext)
                     except ValueError:
                         logging.info(f"File extension {file_ext} not supported")
-                        continue
+                        return
                     with open(file_path, "r") as f:
                         code = f.read()
                         logging.info(f"Embedding {file_path} as {lang.value}")
@@ -114,6 +116,11 @@ def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
                                 documents=[doc.page_content],
                                 metadatas=[doc.metadata],
                             )
+                outstanding = []
+                for file in files:
+                    outstanding.append(executor.submit(process_file, file))
+                [result.result() for result in as_completed(outstanding)]
+
 
     langchain_chroma = Chroma(
         client=persistent_client,
