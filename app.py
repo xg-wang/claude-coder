@@ -19,22 +19,14 @@ def gen_retriever(repo_url, reset):
 
     return retriever
 
-def get_reset_flag(repo_url):
-    # TODO: check if repo_url is in the chromdb
-    return False
-
-def get_repo_url():
-    # TODO: get from gr text input
-    return "https://github.com/openai/whisper"
-
 def gen_response(message, chat_history, repo_url):
     llm = ChatAnthropic(model=MODEL_NAME,
                         anthropic_api_key=os.environ.get('CLAUDE_API_KEY', None),
                         max_tokens_to_sample=MAX_TOKEN_TO_SAMPLE)
-    repo_url = get_repo_url()
-    reset = get_reset_flag(repo_url)
-    retriever = gen_retriever(repo_url, reset)
+
+    retriever = gen_retriever(repo_url, reset=False)
     qa = ConversationalRetrievalChain.from_llm(llm, retriever=retriever)
+    ## TODO: update chat_history
     result = qa({"question": message, "chat_history": []})
     bot_message = result["answer"]
     chat_history.append((message, bot_message))
@@ -42,8 +34,13 @@ def gen_response(message, chat_history, repo_url):
 
 def learn_repo(repo_url):
   # TODO: update reset
-  if repo_url.startswith("https://github.com/"):
-    embed_repo(repo_url=repo_url, reset=False)
+    if repo_url.startswith("https://github.com/"):
+        embed_repo(repo_url=repo_url, reset=False)
+        return "OK"
+    else:
+        print("Repo URL must starts with https")
+        return "ERROR"
+
 
 def chat_page():
     with gr.Blocks() as demo:
