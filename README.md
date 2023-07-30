@@ -94,7 +94,7 @@ Traceback (most recent call last):
 TypeError: Collection.add() missing 1 required positional argument: 'ids'
 ```
 
-**Thought**: My example code had an error because I was missing the document ids when calling add(). Here is the fixed code:
+**Thought**: My example code had an error because **I was missing the document ids when calling add()**. Here is the fixed code:
 
 **Action**: code_interpreter
 
@@ -120,7 +120,7 @@ print(results)
 ```
 
 **Observation**:
-```json
+```
 {'ids': [['doc1', 'doc2']], 'distances': [[0.030000001192092896, 0.12000000476837158]], 'metadatas': [[None, None]], 'embeddings': None, 'documents': [['Document 1', 'Document 2']]}
 ```
 
