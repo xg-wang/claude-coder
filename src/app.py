@@ -6,6 +6,9 @@ from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
 from src.code_search_tool import embed_repo
 from src.util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
+from src.code_agent import initialize_claude_coder, run_agent_qa
+
+global AGENT
 
 def gen_retriever(repo_url, reset):
     db = embed_repo(repo_url, reset)
@@ -34,6 +37,7 @@ def learn_repo(repo_url):
   # TODO: update reset
     if repo_url.startswith("https://github.com/"):
         embed_repo(repo_url=repo_url, reset=False)
+        AGENT = initialize_claude_coder(repo_url)
         return "OK"
     else:
         print("Repo URL must starts with https")
@@ -60,15 +64,30 @@ def chat_page():
 
 
         with gr.Row():
+
             with gr.Column(scale=5):
                 chatbot = gr.Chatbot().style(height=750)
                 msg = gr.Textbox()
                 clear = gr.ClearButton([msg, chatbot])
                 msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
             with gr.Column(scale=5):
-                code_log = gr.TextArea(label="Logging").style(height=500)
+                logbot = gr.Chatbot().style(height=750)
+                msg = gr.Textbox()
+                msg.submit(gen_log, [msg, logbot, AGENT], [msg, logbot], queue=False).then(gen_log, logbot, logbot)
 
     demo.launch()
+
+def gen_log(query, logbot, agent):
+    for step in run_agent_qa(query, agent):
+        # logging.info(f"Step: {step}")
+        if output := step.get("intermediate_step"):
+            action, value = output[0]
+            #logging.info(f"action:\n{action.tool}")
+            yield f"tool input:\n{action.tool_input}"
+            # logging.info(f"value:\n{value}")
+        elif output := step.get("output"):
+            #logging.info(f"Output: {output}")
+            return f"Output: {output}"
 
 def main():
     setup_logging()
