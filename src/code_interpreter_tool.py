@@ -41,7 +41,7 @@ class CodeInterpreterTool(BaseTool):
 
     DOCKERFILE = """
     FROM python:3.10
-    RUN pip install numpy pandas matplotlib seaborn pydantic chromadb onnxruntime
+    RUN pip install numpy pandas matplotlib seaborn pydantic chromadb onnxruntime hupper cowsay
     """
 
     def __init__(self, *args, **kwargs):

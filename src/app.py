@@ -1,3 +1,4 @@
+import logging
 import os
 import gradio as gr
 import os
@@ -68,16 +69,16 @@ def chat_page():
 
         with gr.Row():
 
-            with gr.Column(scale=5):
-                chatbot = gr.Chatbot().style(height=750)
-                msg = gr.Textbox()
-                clear = gr.ClearButton([msg, chatbot])
-                msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
+            # with gr.Column(scale=5):
+            #     chatbot = gr.Chatbot().style(height=750)
+            #     msg = gr.Textbox()
+            #     clear = gr.ClearButton([msg, chatbot])
+            #     msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
             with gr.Column(scale=5):
                 logbot = gr.Chatbot().style(height=750)
                 message = gr.Textbox()
                 
-                message.submit(user, [message, logbot], [message, logbot], queue=False).then(gen_log, [message, logbot], logbot)
+                message.submit(user, [message, logbot], [message, logbot], queue=True).then(gen_log, [message, logbot], logbot)
     demo.queue()
     demo.launch()
 
@@ -89,23 +90,26 @@ def gen_log(query, history):
     global agent
     history[-1][1] = ""
     for step in run_agent_qa(query, agent):
-        # logging.info(f"Step: {step}")
+        logging.info(f"Step: {step}")
         if output := step.get("intermediate_step"):
             action, value = output[0]
             # history[-1][1] += f"action:\n{action.tool}"
-            history[-1][1] += f"tool input:\n{action.tool_input} \n"
-            history[-1][1] += f"action:\n{action.tool} \n"
-            history[-1][1] += f"value:\n{value} \n"
-            #logging.info(f"action:\n{action.tool}")
-            yield history
+            history[-1][1] += f"Tool input:\n{action.tool_input} \n"
+            history[-1][1] += f"Action:\n{action.tool} \n"
+            history[-1][1] += f"Value:\n{value} \n"
+            # logging.info(f"action:\n{action.tool}")
             # logging.info(f"value:\n{value}")
-        elif output := step.get("output"):
-            #logging.info(f"Output: {output}")
+        if output:=step.get("output"):
             history[-1][1] += f"Output: {output}"
-            yield history
+        yield history
+        # else:
+        #     output = step.get("output")
+        #     logging.info(f"Output: {output}")
+        #     history[-1][1] += f"Output: {output}"
+        #     yield history
 
 def main():
-    setup_logging()
+    setup_logging(True)
     # 1.1 Add github repo and generate the repo database via LangChain
         # Repo clone
         # Text splitter

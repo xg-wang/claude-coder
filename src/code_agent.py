@@ -33,13 +33,13 @@ def run_agent_qa(question: str, agent: AgentExecutor) -> Generator[dict[str, Any
         # logging.info(f"Step: {step}")
         if output := step.get("intermediate_step"):
             action, value = output[0]
-            logging.info(f"action:\n{action.tool}")
-            logging.info(f"tool input:\n{action.tool_input}")
-            logging.info(f"value:\n{value}")
+            # logging.info(f"action:\n{action.tool}")
+            # logging.info(f"tool input:\n{action.tool_input}")
+            # logging.info(f"value:\n{value}")
             yield step
         elif output := step.get("output"):
-            logging.info(f"Output: {output}")
-            return step
+            # logging.info(f"Output: {output}")
+            yield step
 
 
 @click.command(
