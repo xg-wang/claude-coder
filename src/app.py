@@ -8,7 +8,7 @@ from src.code_search_tool import embed_repo
 from src.util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
 from src.code_agent import initialize_claude_coder, run_agent_qa
 
-global AGENT
+
 
 def gen_retriever(repo_url, reset):
     db = embed_repo(repo_url, reset)
@@ -37,7 +37,8 @@ def learn_repo(repo_url):
   # TODO: update reset
     if repo_url.startswith("https://github.com/"):
         embed_repo(repo_url=repo_url, reset=False)
-        AGENT = initialize_claude_coder(repo_url)
+        global agent
+        agent = initialize_claude_coder(repo_url)
         return "OK"
     else:
         print("Repo URL must starts with https")
@@ -72,22 +73,32 @@ def chat_page():
                 msg.submit(gen_response, [msg, chatbot, repo_url], [msg, chatbot])
             with gr.Column(scale=5):
                 logbot = gr.Chatbot().style(height=750)
-                msg = gr.Textbox()
-                msg.submit(gen_log, [msg, logbot, AGENT], [msg, logbot], queue=False).then(gen_log, logbot, logbot)
-
+                message = gr.Textbox()
+                
+                message.submit(user, [message, logbot], [message, logbot], queue=False).then(gen_log, [message, logbot], logbot)
+    demo.queue()
     demo.launch()
 
-def gen_log(query, logbot, agent):
+
+def user(user_message, history):
+    return user_message, history + [[ user_message, None]]
+
+def gen_log(query, history):
+    global agent
+    history[-1][1] = ""
     for step in run_agent_qa(query, agent):
         # logging.info(f"Step: {step}")
         if output := step.get("intermediate_step"):
             action, value = output[0]
+            # history[-1][1] += f"action:\n{action.tool}"
+            history[-1][1] += f"tool input:\n{action.tool_input}"
             #logging.info(f"action:\n{action.tool}")
-            yield f"tool input:\n{action.tool_input}"
+            yield history
             # logging.info(f"value:\n{value}")
         elif output := step.get("output"):
             #logging.info(f"Output: {output}")
-            return f"Output: {output}"
+            history[-1][1] += f"Output: {output}"
+            return history
 
 def main():
     setup_logging()
