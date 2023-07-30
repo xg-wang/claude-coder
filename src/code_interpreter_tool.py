@@ -16,7 +16,6 @@ from dotenv import load_dotenv, find_dotenv
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
-from langchain.llms import Anthropic
 from langchain.chat_models import ChatAnthropic
 import langchain
 
@@ -93,8 +92,7 @@ if __name__ == "__main__":
     tool = CodeInterpreterTool()
     agent = initialize_agent(
         [tool],
-        # ChatAnthropic(temperature=0, model='claude-2'),
-        Anthropic(temperature=0, model='claude-2'),
+        ChatAnthropic(temperature=0, model='claude-2'),
         # ChatOpenAI(),
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True,
