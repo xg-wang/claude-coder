@@ -62,17 +62,19 @@ class CodeInterpreterTool(BaseTool):
         # Use subprocess.run to call docker run, and return the stdio or stderr
         p = subprocess.run(
             ["docker", "run", "--rm", "-i", "python_code_interpreter:latest"],
-            input=code.encode('utf-8'),
+            input=code,
             capture_output=True,
             check=False,
+            encoding='utf-8',
+            text=True,
         )
         if p.returncode != 0:
             logging.info(f"returncode: {p.returncode}")
             logging.info(f"stdout: {p.stdout}")
             logging.info(f"stderr: {p.stderr}")
-            return str(p.stderr, encoding='utf-8') or "The code is not valid"
+            return p.stderr or "The code is not valid"
         else:
-            return str(p.stdout, encoding='utf-8')
+            return p.stdout
 
     async def _arun(
         self,
