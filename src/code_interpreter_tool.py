@@ -104,6 +104,6 @@ if __name__ == "__main__":
         # logging.info(f"Step: {step}")
         if output := step.get("intermediate_step"):
             action, value = output[0]
-            logging.info(f"action: {action.tool}, log: {action.log}, value: {value}")
+            logging.info(f"action:\n{action.tool}\nlog:\n{action.log}\nvalue:\n{value}")
         elif output := step.get("output"):
             logging.info(f"Output: {output}")
