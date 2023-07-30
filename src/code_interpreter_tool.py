@@ -19,6 +19,13 @@ from langchain.llms import Anthropic
 from langchain.chat_models import ChatAnthropic
 import langchain
 
+def clean_code(code: str) -> str:
+    code = code.strip()
+    if code.startswith("```python"):
+        code = code.removeprefix("```python\n")
+        code = code.removesuffix("```")
+    return code
+
 class CodeInterpreterTool(BaseTool):
     name = "code_interpreter"
     description = "Executes Python code in a Docker container. It returns the log output of the Python code."
@@ -48,10 +55,7 @@ class CodeInterpreterTool(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Run code in a Docker container."""
-        code = code.strip()
-        if code.startswith("```python"):
-            code = code.removeprefix("```python\n")
-            code = code.removesuffix("```")
+        code = clean_code(code)
         logging.info(f"Running code\n```\n{code}\n```\n")
         logging.info(f"run_manager: {run_manager}")
         try:
