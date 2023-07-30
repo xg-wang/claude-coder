@@ -7,6 +7,8 @@ from langchain.chains import ConversationalRetrievalChain
 from src.code_search_tool import embed_repo
 from src.util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
 from src.code_agent import initialize_claude_coder, run_agent_qa
+from termcolor import colored
+
 
 
 
@@ -91,14 +93,16 @@ def gen_log(query, history):
         if output := step.get("intermediate_step"):
             action, value = output[0]
             # history[-1][1] += f"action:\n{action.tool}"
-            history[-1][1] += f"tool input:\n{action.tool_input}"
+            history[-1][1] += f"tool input:\n{action.tool_input} \n"
+            history[-1][1] += f"action:\n{action.tool} \n"
+            history[-1][1] += f"value:\n{value} \n"
             #logging.info(f"action:\n{action.tool}")
             yield history
             # logging.info(f"value:\n{value}")
         elif output := step.get("output"):
             #logging.info(f"Output: {output}")
             history[-1][1] += f"Output: {output}"
-            return history
+            yield history
 
 def main():
     setup_logging()
