@@ -14,7 +14,7 @@ from contextlib import contextmanager
 import subprocess
 import pathlib
 from dotenv import load_dotenv, find_dotenv
-from .util import setup_logging
+from src.util import setup_logging
 
 
 GIT_REPOS_DIR = pathlib.Path(__file__).parent.parent / "git_repos"

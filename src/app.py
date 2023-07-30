@@ -4,8 +4,8 @@ import os
 from langchain.chat_models import ChatAnthropic
 from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
-from .clone_and_embed_repo import embed_repo
-from .util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
+from src.clone_and_embed_repo import embed_repo
+from src.util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
 
 def gen_retriever(repo_url, reset):
     db = embed_repo(repo_url, reset)

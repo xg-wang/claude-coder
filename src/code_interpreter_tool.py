@@ -17,10 +17,9 @@ from langchain.agents import initialize_agent
 from langchain.agents import AgentType
 from langchain.chat_models import ChatOpenAI
 from langchain.chat_models import ChatAnthropic
-import langchain
-from .util import setup_logging
+from src.util import setup_logging
 
-def clean_code(code: str) -> str:
+def _clean_code(code: str) -> str:
     """Clean code from Markdown code blocks."""
     code = code.strip()
     if code.startswith("```python\n"):
@@ -37,7 +36,7 @@ def clean_code(code: str) -> str:
 
 class CodeInterpreterTool(BaseTool):
     name = "code_interpreter"
-    description = "Executes Python code in a Docker container. It returns the log output of the Python code."
+    description = "Executes Python code in a Docker container. It returns the log output of the Python code. If the output is stderr, use it to improve your code. You should only input valid Python program</Instruction>"
     client: DockerClient = Field(default_factory=docker.from_env)
 
     DOCKERFILE = """
@@ -64,7 +63,7 @@ class CodeInterpreterTool(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Run code in a Docker container."""
-        code = clean_code(code)
+        code = _clean_code(code)
         logging.info(f"Running code\n```\n{code}\n```\n")
         # Use subprocess.run to call docker run, and return the stdio or stderr
         p = subprocess.run(
@@ -94,6 +93,7 @@ class CodeInterpreterTool(BaseTool):
 
 if __name__ == "__main__":
     setup_logging()
+    load_dotenv(find_dotenv())
 
     tool = CodeInterpreterTool()
     agent = initialize_agent(
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         verbose=True,
     )
     # question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\thow to use ChromaDB functionalities? can you give an example"
-    question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\nWhat is the result of 10!"
+    question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction>\nWhat is the result of 10!"
     # agent.run(question)
     for step in agent.iter(question):
         # logging.info(f"Step: {step}")
