@@ -4,7 +4,7 @@ import os
 from langchain.chat_models import ChatAnthropic
 from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
-from src.clone_and_embed_repo import embed_repo
+from src.code_search_tool import embed_repo
 from src.util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
 
 def gen_retriever(repo_url, reset):

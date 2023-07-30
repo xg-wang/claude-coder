@@ -12,8 +12,18 @@ poetry install
 
 ## How to run
 
-```
+```sh
+# Run the web app
 poetry run serve
+
+# Run the claude coder agent
+poetry run python src/code_agent.py --repo "https://github.com/chroma-core/chroma" --query "How do I use chromadb? Can you run an example?"
+
+# Run the standalone code search agent
+poetry run python src/code_search_tool.py --repo "https://github.com/openai/whisper" --query 'what is whisper'
+
+# RUn the standalone code interpreter agent
+poetry run python src/code_interpreter_tool.py
 ```
 
 

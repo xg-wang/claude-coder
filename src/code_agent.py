@@ -6,7 +6,7 @@ from langchain.agents.agent import AgentExecutor
 from langchain.chat_models import ChatAnthropic
 from src.util import setup_logging
 from src.util import MODEL_NAME, MAX_TOKEN_TO_SAMPLE
-from src.clone_and_embed_repo import CodeSearchTool
+from src.code_search_tool import CodeSearchTool
 from src.code_interpreter_tool import CodeInterpreterTool
 import logging
 

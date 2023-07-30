@@ -186,7 +186,7 @@ class CodeSearchTool(BaseTool):
 
 #########################################################################
 # Example usage:
-# poetry run python src/clone_and_embed_repo.py --reset --repo "https://github.com/openai/whisper" --query 'what is whisper'
+# poetry run python src/code_search_tool.py --repo "https://github.com/openai/whisper" --query 'what is whisper'
 # Use python click to create a CLI, --reset to reset the database
 @click.command()
 @click.option("--repo", required=True, help="The URL of the repo.")

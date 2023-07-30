@@ -103,7 +103,6 @@ if __name__ == "__main__":
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True,
     )
-    # question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\thow to use ChromaDB functionalities? can you give an example"
     question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction>\nWhat is the result of 10!"
     # agent.run(question)
     for step in agent.iter(question):
