@@ -97,4 +97,13 @@ if __name__ == "__main__":
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True,
     )
-    agent.run("<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\thow to use ChromaDB functionalities? can you give an example")
+    # question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\thow to use ChromaDB functionalities? can you give an example"
+    question = "<Instruction>When you have the answer, always say 'Final Answer:'</Instruction><Instruction>You should only write valid Python program</Instruction>\nWhat is the result of 10!"
+    # agent.run(question)
+    for step in agent.iter(question):
+        # logging.info(f"Step: {step}")
+        if output := step.get("intermediate_step"):
+            action, value = output[0]
+            logging.info(f"action: {action.tool}, log: {action.log}, value: {value}")
+        elif output := step.get("output"):
+            logging.info(f"Output: {output}")
