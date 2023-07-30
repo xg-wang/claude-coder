@@ -131,7 +131,7 @@ def main(repo, query, reset):
     load_dotenv(find_dotenv())
     db = embed_repo(repo, reset=reset)
     docs = db.similarity_search(query, k=10)
-    print(len(docs))
+    print(f"Documents length: {len(docs)}")
     for doc in docs:
         print(f"\nFile path: {doc.metadata['path']}")
         print(f"Document content:\n{doc.page_content}")
