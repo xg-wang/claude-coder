@@ -22,12 +22,12 @@ from src.util import setup_logging
 def _clean_code(code: str) -> str:
     """Clean code from Markdown code blocks."""
     code = code.strip()
-    if code.startswith("```python\n"):
-        code = code.removeprefix("```python\n")
-    elif code.startswith("```py\n"):
-        code = code.removeprefix("```py\n")
+    if code.startswith("```python"):
+        code = code.removeprefix("```python")
+    elif code.startswith("```py"):
+        code = code.removeprefix("```py")
     elif code.startswith("```"):
-        code = code.removeprefix("```\n")
+        code = code.removeprefix("```")
     code = code.removesuffix("```")
     if code.startswith("`"):
         code = code.strip("`")
@@ -41,7 +41,7 @@ class CodeInterpreterTool(BaseTool):
 
     DOCKERFILE = """
     FROM python:3.10
-    RUN pip install numpy pandas matplotlib seaborn pydantic chromadb
+    RUN pip install numpy pandas matplotlib seaborn pydantic chromadb onnxruntime
     """
 
     def __init__(self, *args, **kwargs):

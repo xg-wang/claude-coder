@@ -139,12 +139,13 @@ from typing import Optional
 
 class CodeSearchTool(BaseTool):
     name = "code_search"
-    description: str
+    repo_name: str
     repo_url: str
+    description: str
 
     def __init__(self, repo_name: str, *args, **kwargs):
         description = f"Useful when you need most up to date code doumentation for {repo_name}. Input should be a fully formed question."
-        super().__init__(description=description, *args, **kwargs)
+        super().__init__(description=description, repo_name=repo_name, *args, **kwargs)
 
     def _run(
         self,
@@ -159,7 +160,7 @@ class CodeSearchTool(BaseTool):
             retriever.search_kwargs["distance_metric"] = "cos"
             retriever.search_kwargs["fetch_k"] = 20
             retriever.search_kwargs["maximal_marginal_relevance"] = True
-            retriever.search_kwargs["k"] = 4
+            retriever.search_kwargs["k"] = 20
 
             return retriever
 
@@ -211,7 +212,7 @@ def main(repo, query, reset, agent):
 
     agent = initialize_agent(
         [tool],
-        ChatAnthropic(temperature=0, model='claude-2'),
+        ChatAnthropic(temperature=0, model=MODEL_NAME),
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         verbose=True,
     )
