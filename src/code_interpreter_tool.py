@@ -36,7 +36,7 @@ def _clean_code(code: str) -> str:
 
 class CodeInterpreterTool(BaseTool):
     name = "code_interpreter"
-    description = "Executes Python code in a Docker container. It returns the log output of the Python code. If the output is stderr, use it to improve your code. You should only input valid Python program</Instruction>"
+    description = "Executes Python code in a Docker container. It returns the log output of the Python code. If the output is stderr, use it to improve your code. Input should be a valid Python program."
     client: DockerClient = Field(default_factory=docker.from_env)
 
     DOCKERFILE = """
