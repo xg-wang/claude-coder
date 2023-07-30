@@ -6,6 +6,10 @@
 
 ## Demo
 
+How does it differ to the raw Claude2?
+
+![claude-coder-comparison-demo](./docs/claude-coder-demo-2.png)
+
 In the following example, the agent is able to retrive the code snippet from the repo, synthesize a code example and run it in the interpreter.
 It first realizes it was missing the document ids when calling add(), it then fixes the code and runs it again to observe the correct result.
 
