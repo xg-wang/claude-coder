@@ -20,11 +20,18 @@ from langchain.chat_models import ChatAnthropic
 import langchain
 
 def clean_code(code: str) -> str:
+    """Clean code from Markdown code blocks."""
     code = code.strip()
-    code = code.removeprefix("```python\n")
-    code = code.removeprefix("`\n")
+    if code.startswith("```python\n"):
+        code = code.removeprefix("```python\n")
+    elif code.startswith("```py\n"):
+        code = code.removeprefix("```py\n")
+    elif code.startswith("```"):
+        code = code.removeprefix("```\n")
     code = code.removesuffix("```")
-    code = code.removesuffix("`")
+    if code.startswith("`"):
+        code = code.strip("`")
+    code = code.strip()
     return code
 
 class CodeInterpreterTool(BaseTool):

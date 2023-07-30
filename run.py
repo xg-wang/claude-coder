@@ -1,7 +1,9 @@
 import hupper
 import dotenv
 
-if __name__ == '__main__':
+def main():
     dotenv.load_dotenv(dotenv.find_dotenv())
-    _ = hupper.start_reloader('app.main')
+    _ = hupper.start_reloader('src.app.main')
 
+if __name__ == '__main__':
+    main()

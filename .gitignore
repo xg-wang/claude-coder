@@ -6,4 +6,4 @@ scratch
 git_repos
 flagged
 .chroma_db
-
+__pycache__

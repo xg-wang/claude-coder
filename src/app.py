@@ -1,13 +1,11 @@
 import os
 import gradio as gr
-from util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE
 import os
-from dotenv import find_dotenv, load_dotenv
 from langchain.chat_models import ChatAnthropic
-from app import MODEL_NAME
-from src.clone_and_embed_repo import embed_repo
 from langchain.chat_models import ChatAnthropic
 from langchain.chains import ConversationalRetrievalChain
+from .clone_and_embed_repo import embed_repo
+from .util import MODEL_NAME, MAX_RETRIES, MAX_TOKEN_TO_SAMPLE, setup_logging
 
 def gen_retriever(repo_url, reset):
     db = embed_repo(repo_url, reset)
@@ -68,7 +66,7 @@ def chat_page():
     demo.launch()
 
 def main():
-
+    setup_logging()
     # 1.1 Add github repo and generate the repo database via LangChain
         # Repo clone
         # Text splitter
@@ -77,13 +75,4 @@ def main():
         # Similarity search in chromdb given user input
         # re-generate the prompt: user input + context
     # 2. Anthropic API to get final response
-
     chat_page()
-
-    # demo = gr.Interface(fn=gen_response, inputs="text", outputs="text")
-
-    # demo.launch()
-
-
-
-

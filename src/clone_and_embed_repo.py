@@ -14,14 +14,13 @@ from contextlib import contextmanager
 import subprocess
 import pathlib
 from dotenv import load_dotenv, find_dotenv
+from .util import setup_logging
 
 
 GIT_REPOS_DIR = pathlib.Path(__file__).parent.parent / "git_repos"
 CHROMA_DB = pathlib.Path(__file__).parent.parent / ".chroma_db"
 
 IGNORE_LIST = [".git", "node_modules", "__pycache__", ".idea", ".vscode"]
-
-logging.basicConfig(level=logging.INFO)
 
 
 def _ext_to_lang(ext: str) -> Language:
@@ -128,6 +127,7 @@ def embed_repo(repo_url: str, reset: bool = False) -> Chroma:
 @click.option('--query', required=True, help='The query for LLM.')
 @click.option('--reset', is_flag=True, default=False, help='Reset ChromaDB.')
 def main(repo, query, reset):
+    setup_logging()
     load_dotenv(find_dotenv())
     db = embed_repo(repo, reset=reset)
     docs = db.similarity_search(query, k=10)
